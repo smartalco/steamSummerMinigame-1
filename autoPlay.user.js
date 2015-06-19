@@ -79,6 +79,7 @@
 	var predictTicks = 0;
 	var predictJumps = 0;
 	var predictLastWormholesUpdate = 0;
+    var wormholeInterval = false;
 
 	var showedUpdateInfo = getPreferenceBoolean("showedUpdateInfo", false);
 
@@ -1174,10 +1175,21 @@
 	function useWormholeIfRelevant() {
 		var level = getGameLevel();
 		if (level % 100 > 95) {
+            if(wormholeInterval) {
+                w.clearInterval(wormholeInterval);
+                wormholeInterval = false;
+            }
 			return;
 		}
         triggerAbility(ABILITIES.FEELING_LUCKY);
-		triggerAbility(ABILITIES.WORMHOLE);
+        
+        if (!wormholeInterval) {
+          wormholeInterval = w.setInterval(function(){
+            g_Minigame.m_CurrentScene.m_rgAbilityQueue.push({'ability': 26}); //wormhole
+            g_Minigame.m_CurrentScene.m_nLastTick = 0;
+            g_Minigame.m_CurrentScene.Tick();
+          }, 100);
+        }
 	}
 
 	function useLikeNew() {
@@ -1190,7 +1202,7 @@
 		// Quit if we dont satisfy the chance
 		var cLobbyTime = (getCurrentTime() - s().m_rgGameData.timestamp_game_start) / 3600;
 		var likeNewChance = (control.useLikeNewMaxChance - control.useLikeNewMinChance) * cLobbyTime/24.0 + control.useLikeNewMinChance;
-		if (Math.random() > .25 && (level % 100 !== 0)) {
+		if (Math.random() > .5 && (level % 100 !== 0)) {
 			return;
 		}
 
