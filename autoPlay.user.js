@@ -1172,6 +1172,10 @@
 	}
 
 	function useWormholeIfRelevant() {
+		var level = getGameLevel();
+		if (level % 100 > 95) {
+			return;
+		}
         triggerAbility(ABILITIES.FEELING_LUCKY);
 		triggerAbility(ABILITIES.WORMHOLE);
 	}
