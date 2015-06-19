@@ -1111,7 +1111,7 @@
 
 	function useNapalmIfRelevant() {
         var level = getGameLevel();
-        if (level % 100 == 0 || level % 100 > 90) {
+        if (level % 100 == 0 || level % 100 > 80) {
             return;
         }
 		triggerAbility(ABILITIES.NAPALM);
