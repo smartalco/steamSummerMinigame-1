@@ -1183,7 +1183,11 @@
 		}
         triggerAbility(ABILITIES.FEELING_LUCKY);
         
-        if (!wormholeInterval) {
+        if( level % 100 > 90 )
+            {
+            triggerAbility(ABILITIES.WORMHOLE);
+            }
+        else if (!wormholeInterval) {
           wormholeInterval = w.setInterval(function(){
             g_Minigame.m_CurrentScene.m_rgAbilityQueue.push({'ability': 26}); //wormhole
             g_Minigame.m_CurrentScene.m_nLastTick = 0;
@@ -1202,7 +1206,7 @@
 		// Quit if we dont satisfy the chance
 		var cLobbyTime = (getCurrentTime() - s().m_rgGameData.timestamp_game_start) / 3600;
 		var likeNewChance = (control.useLikeNewMaxChance - control.useLikeNewMinChance) * cLobbyTime/24.0 + control.useLikeNewMinChance;
-		if (Math.random() > .5 && (level % 100 !== 0)) {
+		if (Math.random() > .2 && (level % 100 !== 0)) {
 			return;
 		}
 
