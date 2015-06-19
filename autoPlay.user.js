@@ -998,11 +998,13 @@
 
 			// target the enemy of the specified type with the lowest hp
 			var mostHPDone = 0;
+            var THISISMYLANE = 10;
 			for (i = 0; i < enemies.length; i++) {
 				if (enemies[i] && !enemies[i].m_bIsDestroyed) {
 					// Only select enemy and lane if the preferedLane matches the potential enemy lane
 					if (lowHP < 1 || enemies[i].m_flDisplayedHP < lowHP) {
 						var element = s().m_rgGameData.lanes[enemies[i].m_nLane].element;
+						var typething = s().m_rgGameData.lanes[enemies[i].m_nLane].type;
 
 						var dmg = s().CalculateDamage(
 							s().m_rgPlayerTechTree.dps,
@@ -1018,6 +1020,13 @@
 						lowHP = enemies[i].m_flDisplayedHP;
 						lowLane = enemies[i].m_nLane;
 						lowTarget = enemies[i].m_nID;
+                        if( typething == 2 )
+                            {
+                            if( lowLane == 0 )
+                                THISISMYLANE = 1;
+                            else
+                                THISISMYLANE = 0;
+                            }
 					}
 					var percentageHP = enemies[i].m_flDisplayedHP / enemies[i].m_data.max_hp;
 					if (lowPercentageHP === 0 || percentageHP < lowPercentageHP) {
@@ -1055,6 +1064,12 @@
 
 		// go to the chosen lane
 		if (targetFound) {
+            if( THISISMYLANE < 10 )
+            {
+                lowLane = THISISMYLANE;
+                lowTarget = THISISMYLANE;
+            }
+
 			if (s().m_nExpectedLane != lowLane) {
 				advLog('Switching to lane' + lowLane, 3);
 				s().TryChangeLane(lowLane);
@@ -1173,20 +1188,35 @@
 	}
 
 	function useWormholeIfRelevant() {
+        triggerAbility(ABILITIES.FEELING_LUCKY);
+
 		var level = getGameLevel();
-		if (level % 100 > 95) {
+		if (level % 100 > 90) {
             if(wormholeInterval) {
                 w.clearInterval(wormholeInterval);
                 wormholeInterval = false;
             }
 			return;
 		}
-        triggerAbility(ABILITIES.FEELING_LUCKY);
-        
-        if( level % 100 > 90 )
-            {
-            triggerAbility(ABILITIES.WORMHOLE);
-            }
+
+        if( level % 100 > 70 )
+        {
+        triggerAbility(ABILITIES.WORMHOLE);
+        }
+        else if ( level % 100 > 59 && !wormholeInterval) {
+          wormholeInterval = w.setInterval(function(){
+            g_Minigame.m_CurrentScene.m_rgAbilityQueue.push({'ability': 26}); //wormhole
+            g_Minigame.m_CurrentScene.m_nLastTick = 0;
+            g_Minigame.m_CurrentScene.Tick();
+          }, 1000);
+        }
+        else if ( level % 100 > 45 && !wormholeInterval) {
+          wormholeInterval = w.setInterval(function(){
+            g_Minigame.m_CurrentScene.m_rgAbilityQueue.push({'ability': 26}); //wormhole
+            g_Minigame.m_CurrentScene.m_nLastTick = 0;
+            g_Minigame.m_CurrentScene.Tick();
+          }, 500);
+        }
         else if (!wormholeInterval) {
           wormholeInterval = w.setInterval(function(){
             g_Minigame.m_CurrentScene.m_rgAbilityQueue.push({'ability': 26}); //wormhole
@@ -1199,8 +1229,8 @@
 	function useLikeNew() {
 		// Check the time before using like new.
 		var level = getGameLevel();
-		if (level % 10 !== 0) {
-			//return;
+		if (level % 100 >= 80 && level % 100 <= 90) {
+			return;
 		}
 
 		// Quit if we dont satisfy the chance
