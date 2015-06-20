@@ -1143,7 +1143,7 @@
 
 	function useClusterBombIfRelevant() {
         var level = getGameLevel();
-        if (level % 100 == 0 || level % 100 > 97) {
+        if (level % 100 == 0 || level % 100 > 90) {
             return;
         }
 		triggerAbility(ABILITIES.CLUSTER_BOMB);
@@ -1154,7 +1154,7 @@
         if (level % 100 == 0 || level % 100 > 60) {
             return;
         }
-		triggerAbility(ABILITIES.NAPALM);
+		//triggerAbility(ABILITIES.NAPALM);
 	}
 
 	// Use Moral Booster if doable
@@ -1164,7 +1164,7 @@
 
 	function useTacticalNukeIfRelevant() {
         var level = getGameLevel();
-        if (level % 100 == 0) {
+        if (level % 100 == 0 || level % 100 > 90) {
             return;
         }
 		triggerAbility(ABILITIES.TACTICAL_NUKE);
@@ -1172,7 +1172,7 @@
 
 	function useCrippleMonsterIfRelevant() {
 		var level = getGameLevel();
-		if (level % 100 == 0) {
+		if (level % 100 == 0 || level % 100 > 96) {
 			return;
 		}
         triggerAbility(ABILITIES.CRIPPLE_MONSTER);
@@ -1226,16 +1226,12 @@
 
         if( level % 100 > 80 && level % 10 != 0 && !wormholeInterval )
         {
-          wormholeInterval = w.setInterval(function(){
-			advLog('WORMHOLE ' + g_Minigame.m_CurrentScene.m_nCurrentLevel, 0);
-            g_Minigame.m_CurrentScene.m_rgAbilityQueue.push({'ability': 26}); //wormhole
-            g_Minigame.m_CurrentScene.m_nLastTick = 0;
-            g_Minigame.m_CurrentScene.Tick();
-          }, 100000);
+			advLog('WORMHOLE ' + getGameLevel().toString(), 0);
+			triggerAbility(ABILITIES.WORMHOLE);
         }
         else if ( level % 100 > 55 && level % 100 < 80 && !wormholeInterval) {
           wormholeInterval = w.setInterval(function(){
-			advLog('WORMHOLE ' + g_Minigame.m_CurrentScene.m_nCurrentLevel, 0);
+			advLog('WORMHOLE ' + getGameLevel().toString(), 0);
             g_Minigame.m_CurrentScene.m_rgAbilityQueue.push({'ability': 26}); //wormhole
             g_Minigame.m_CurrentScene.m_nLastTick = 0;
             g_Minigame.m_CurrentScene.Tick();
@@ -1243,15 +1239,15 @@
         }
         else if ( level % 100 > 29 && level % 100 < 56 && !wormholeInterval) {
           wormholeInterval = w.setInterval(function(){
-			advLog('WORMHOLE ' + g_Minigame.m_CurrentScene.m_nCurrentLevel, 0);
+			advLog('WORMHOLE ' + getGameLevel().toString(), 0);
             g_Minigame.m_CurrentScene.m_rgAbilityQueue.push({'ability': 26}); //wormhole
             g_Minigame.m_CurrentScene.m_nLastTick = 0;
             g_Minigame.m_CurrentScene.Tick();
-          }, 500);
+          }, 333);
         }
         else if ( level % 100 >= 0 && level % 100 < 30 && !wormholeInterval) {
           wormholeInterval = w.setInterval(function(){
-			advLog('WORMHOLE ' + g_Minigame.m_CurrentScene.m_nCurrentLevel, 0);
+			advLog('WORMHOLE ' + getGameLevel().toString(), 0);
             g_Minigame.m_CurrentScene.m_rgAbilityQueue.push({'ability': 26}); //wormhole
             g_Minigame.m_CurrentScene.m_nLastTick = 0;
             g_Minigame.m_CurrentScene.Tick();
@@ -1269,9 +1265,10 @@
 		// Quit if we dont satisfy the chance
 		var cLobbyTime = (getCurrentTime() - s().m_rgGameData.timestamp_game_start) / 3600;
 		var likeNewChance = (control.useLikeNewMaxChance - control.useLikeNewMinChance) * cLobbyTime/24.0 + control.useLikeNewMinChance;
-		if ((Math.random() > .1 && (level % 100 !== 0)) ||
-			(Math.random() > .2 && (level % 100 < 65 )) ||
-			(Math.random() > .6 && (level % 100 < 45 ))){
+		if (Math.random() > .6 && (level % 100 < 45 ) && (level % 100 != 0){
+			;
+		}
+		else if (Math.random() > .1 && (level % 100 !== 0)){
 			return;
 		}
 
@@ -1280,7 +1277,7 @@
 		}
 		
 		// Make sure that we're still in the boss round when we actually use it.
-		advLog('LIKE NEW ' + g_Minigame.m_CurrentScene.m_nCurrentLevel, 0);
+		advLog('LIKE NEW ' + getGameLevel().toString(), 0);
 		triggerAbility(ABILITIES.LIKE_NEW);
 	}
 
