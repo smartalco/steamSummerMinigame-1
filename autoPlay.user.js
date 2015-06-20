@@ -1,13 +1,13 @@
 // ==UserScript==
-// @name /u/wchill Monster Minigame Auto-script w/ auto-click
-// @namespace https://github.com/wchill/steamSummerMinigame
+// @name /u/smartalco Monster Minigame Auto-script w/ auto-click
+// @namespace https://github.com/smartalco/steamSummerMinigame
 // @description A script that runs the Steam Monster Minigame for you.
 // @version 6.0
 // @match *://steamcommunity.com/minigame/towerattack*
 // @match *://steamcommunity.com//minigame/towerattack*
 // @grant none
-// @updateURL https://raw.githubusercontent.com/wchill/steamSummerMinigame/master/autoPlay.user.js
-// @downloadURL https://raw.githubusercontent.com/wchill/steamSummerMinigame/master/autoPlay.user.js
+// @updateURL https://raw.githubusercontent.com/smartalco/steamSummerMinigame-1/master/autoPlay.user.js
+// @downloadURL https://raw.githubusercontent.com/smartalco/steamSummerMinigame-1/master/autoPlay.user.js
 // ==/UserScript==
 
 // IMPORTANT: Update the @version property above to a higher number such as 1.1 and 1.2 when you update the script! Otherwise, Tamper / Greasemonkey users will not update automatically.
@@ -16,7 +16,7 @@
 	"use strict";
 
 	//Version displayed to client, update along with the @version above
-	var SCRIPT_VERSION = '6.0';
+	var SCRIPT_VERSION = '1000.0';
 
 	// OPTIONS
 	var clickRate = 20;
@@ -173,7 +173,7 @@
 	}
 
 	function firstRun() {
-		advLog("Starting /u/wchill's script (version " + SCRIPT_VERSION + ")", 1);
+		advLog("Starting /u/smartalco's script (version " + SCRIPT_VERSION + ")", 1);
 
 		trt_oldCrit = s().DoCritEffect;
 		trt_oldPush = s().m_rgClickNumbers.push;
@@ -1143,7 +1143,7 @@
 
 	function useClusterBombIfRelevant() {
         var level = getGameLevel();
-        if (level % 100 == 0 || level % 100 > 90) {
+        if (level % 100 == 0 || level % 100 > 60) {
             return;
         }
 		triggerAbility(ABILITIES.CLUSTER_BOMB);
@@ -1164,7 +1164,7 @@
 
 	function useTacticalNukeIfRelevant() {
         var level = getGameLevel();
-        if (level % 100 == 0 || level % 100 > 90) {
+        if (level % 100 == 0 || level % 100 > 60) {
             return;
         }
 		triggerAbility(ABILITIES.TACTICAL_NUKE);
@@ -1220,7 +1220,7 @@
 		}
 
 		var level = getGameLevel();
-		if (level % 100 > 90) {
+		if (level % 100 > 85) {
 			return;
 		}
 
@@ -1265,14 +1265,14 @@
 		// Quit if we dont satisfy the chance
 		var cLobbyTime = (getCurrentTime() - s().m_rgGameData.timestamp_game_start) / 3600;
 		var likeNewChance = (control.useLikeNewMaxChance - control.useLikeNewMinChance) * cLobbyTime/24.0 + control.useLikeNewMinChance;
-		if (Math.random() > .6 && (level % 100 < 45 ) && (level % 100 != 0){
+		if (Math.random() > .6 && (level % 100 < 45 ) && (level % 100 != 0)){
 			;
 		}
 		else if (Math.random() > .1 && (level % 100 !== 0)){
 			return;
 		}
 
-		if( Math.random() > .5 && (level % 100 == 0 )) {
+		if( Math.random() > .6 && (level % 100 == 0 )) {
 			return;
 		}
 		
