@@ -410,7 +410,11 @@
 			attemptRespawn();
 			useLikeNew();
 			useWormholeIfRelevant();
-			goToLaneWithBestTarget();
+			if (level % control.rainingRounds === 0) {
+				goToRainingLane();
+			} else {
+				goToLaneWithBestTarget();
+			}
 			useCooldownIfRelevant();
 			useGoodLuckCharmIfRelevant();
 			useMedicsIfRelevant();
@@ -923,6 +927,26 @@
 		document.getElementById("players_in_game").innerHTML = totalPlayers + "/1500";
 	}
 
+	function goToRainingLane() {
+		// On a WH level, jump everyone to lane 0, unless there is a boss there, in which case jump to lane 1.
+		var targetLane = 0;
+		// Check lane 0, enemy 0 to see if it's a boss.
+		var enemyData = s().GetEnemy(0, 0).m_data;
+		if (typeof enemyData !== "undefined") {
+			var enemyType = enemyData.type;
+			if (enemyType == ENEMY_TYPE.BOSS) {
+				advLog('In lane 0, there is a boss, avoiding', 4);
+				targetLane = 1;
+			}
+		}
+
+		if (s().m_nExpectedLane != targetLane) {
+			advLog('Switching to raining lane' + targetLane, 3);
+			s().TryChangeLane(targetLane);
+		}
+	}
+
+
 	function goToLaneWithBestTarget() {
 		// We can overlook spawners if all spawners are 40% hp or higher and a creep is under 10% hp
 		var spawnerOKThreshold = 0.4;
@@ -952,6 +976,7 @@
 		var targetIsTreasure = false;
 		var targetIsBoss = false;
 
+		var THISISMYLANE = 10;
 		for (var k = 0; !targetFound && k < enemyTypePriority.length; k++) {
 			targetIsTreasure = (enemyTypePriority[k] == ENEMY_TYPE.TREASURE);
 			targetIsBoss = (enemyTypePriority[k] == ENEMY_TYPE.BOSS);
@@ -998,7 +1023,6 @@
 
 			// target the enemy of the specified type with the lowest hp
 			var mostHPDone = 0;
-            var THISISMYLANE = 10;
 			for (i = 0; i < enemies.length; i++) {
 				if (enemies[i] && !enemies[i].m_bIsDestroyed) {
 					// Only select enemy and lane if the preferedLane matches the potential enemy lane
@@ -1119,7 +1143,7 @@
 
 	function useClusterBombIfRelevant() {
         var level = getGameLevel();
-        if (level % 100 == 0) {
+        if (level % 100 == 0 || level % 100 > 97) {
             return;
         }
 		triggerAbility(ABILITIES.CLUSTER_BOMB);
@@ -1127,7 +1151,7 @@
 
 	function useNapalmIfRelevant() {
         var level = getGameLevel();
-        if (level % 100 == 0 || level % 100 > 80) {
+        if (level % 100 == 0 || level % 100 > 60) {
             return;
         }
 		triggerAbility(ABILITIES.NAPALM);
@@ -1184,41 +1208,50 @@
 
 
 	function useMaxElementalDmgIfRelevant() {
-		tryUsingItem(ABILITIES.MAX_ELEMENTAL_DAMAGE, true);
+		//tryUsingItem(ABILITIES.MAX_ELEMENTAL_DAMAGE, true);
 	}
 
 	function useWormholeIfRelevant() {
         triggerAbility(ABILITIES.FEELING_LUCKY);
 
+		if(wormholeInterval) {
+			w.clearInterval(wormholeInterval);
+			wormholeInterval = false;
+		}
+
 		var level = getGameLevel();
 		if (level % 100 > 90) {
-            if(wormholeInterval) {
-                w.clearInterval(wormholeInterval);
-                wormholeInterval = false;
-            }
 			return;
 		}
 
-        if( level % 100 > 70 )
+        if( level % 100 > 80 && level % 10 != 0 && !wormholeInterval )
         {
-        triggerAbility(ABILITIES.WORMHOLE);
-        }
-        else if ( level % 100 > 59 && !wormholeInterval) {
           wormholeInterval = w.setInterval(function(){
+			advLog('WORMHOLE ' + g_Minigame.m_CurrentScene.m_nCurrentLevel, 0);
             g_Minigame.m_CurrentScene.m_rgAbilityQueue.push({'ability': 26}); //wormhole
             g_Minigame.m_CurrentScene.m_nLastTick = 0;
             g_Minigame.m_CurrentScene.Tick();
-          }, 1000);
+          }, 100000);
         }
-        else if ( level % 100 > 45 && !wormholeInterval) {
+        else if ( level % 100 > 55 && level % 100 < 80 && !wormholeInterval) {
           wormholeInterval = w.setInterval(function(){
+			advLog('WORMHOLE ' + g_Minigame.m_CurrentScene.m_nCurrentLevel, 0);
+            g_Minigame.m_CurrentScene.m_rgAbilityQueue.push({'ability': 26}); //wormhole
+            g_Minigame.m_CurrentScene.m_nLastTick = 0;
+            g_Minigame.m_CurrentScene.Tick();
+          }, 990);
+        }
+        else if ( level % 100 > 29 && level % 100 < 56 && !wormholeInterval) {
+          wormholeInterval = w.setInterval(function(){
+			advLog('WORMHOLE ' + g_Minigame.m_CurrentScene.m_nCurrentLevel, 0);
             g_Minigame.m_CurrentScene.m_rgAbilityQueue.push({'ability': 26}); //wormhole
             g_Minigame.m_CurrentScene.m_nLastTick = 0;
             g_Minigame.m_CurrentScene.Tick();
           }, 500);
         }
-        else if (!wormholeInterval) {
+        else if ( level % 100 >= 0 && level % 100 < 30 && !wormholeInterval) {
           wormholeInterval = w.setInterval(function(){
+			advLog('WORMHOLE ' + g_Minigame.m_CurrentScene.m_nCurrentLevel, 0);
             g_Minigame.m_CurrentScene.m_rgAbilityQueue.push({'ability': 26}); //wormhole
             g_Minigame.m_CurrentScene.m_nLastTick = 0;
             g_Minigame.m_CurrentScene.Tick();
@@ -1229,18 +1262,25 @@
 	function useLikeNew() {
 		// Check the time before using like new.
 		var level = getGameLevel();
-		if (level % 100 >= 80 && level % 100 <= 90) {
+		if (level % 100 >= 80) {
 			return;
 		}
 
 		// Quit if we dont satisfy the chance
 		var cLobbyTime = (getCurrentTime() - s().m_rgGameData.timestamp_game_start) / 3600;
 		var likeNewChance = (control.useLikeNewMaxChance - control.useLikeNewMinChance) * cLobbyTime/24.0 + control.useLikeNewMinChance;
-		if (Math.random() > .2 && (level % 100 !== 0)) {
+		if ((Math.random() > .1 && (level % 100 !== 0)) ||
+			(Math.random() > .2 && (level % 100 < 65 )) ||
+			(Math.random() > .6 && (level % 100 < 45 ))){
 			return;
 		}
 
+		if( Math.random() > .5 && (level % 100 == 0 )) {
+			return;
+		}
+		
 		// Make sure that we're still in the boss round when we actually use it.
+		advLog('LIKE NEW ' + g_Minigame.m_CurrentScene.m_nCurrentLevel, 0);
 		triggerAbility(ABILITIES.LIKE_NEW);
 	}
 
